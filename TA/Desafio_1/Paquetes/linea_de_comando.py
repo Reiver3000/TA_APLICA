@@ -39,8 +39,6 @@ def readCommand( argv ):
 			mapa[sublista[1]].append((sublista[0],sublista[2]))
 		else:
 			mapa[sublista[1]]=[(sublista[0],sublista[2])]
-			
-		print(mapa)
 		
 	if options.heuristica!=None:
 		h_pitts_txt=open(options.heuristica,"r")
