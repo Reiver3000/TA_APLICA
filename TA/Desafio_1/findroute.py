@@ -4,7 +4,9 @@ import numpy as np
 from random import shuffle, random, sample, randint
 from copy import deepcopy
 from math import exp
+
 #____________________________________________________________________________________________________________________________
+
 from Paquetes.linea_de_comando import readCommand
 
 if __name__=="__main__":
@@ -22,7 +24,7 @@ if __name__=="__main__":
 	solvers[args['solver']]( args['puzzle'], args['solverParams'] )  # Call the solver method passing the string of
 
 
-____________________________________________________________________________________________________________________________
+#____________________________________________________________________________________________________________________________
 """
 (╯°□°）╯︵ ┻━┻
 
