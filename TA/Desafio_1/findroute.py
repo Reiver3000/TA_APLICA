@@ -8,6 +8,7 @@ from math import exp
 #____________________________________________________________________________________________________________________________
 
 from Paquetes.linea_de_comando import readCommand
+from Paquetes.busquedas import *
 
 if __name__=="__main__":
 	"""
@@ -19,9 +20,28 @@ if __name__=="__main__":
 	> python findroute.py --help
     """
 	args = readCommand( sys.argv[1:] ) # Get the arguments from the command line input
-	solvers = {'sa': sa_solver,	'ga': ga_solver }  # Dictionary of available solvers
+	print(args['nodoI'])
+	print(args['nodoF'])
+	print(args['busqueda'])
+	print(args['mapa'])
 
-	solvers[args['solver']]( args['puzzle'], args['solverParams'] )  # Call the solver method passing the string of
+	"""Instancia el problema de busqueda con nodo inicial 'A' y nodo objetivo 'B' """
+	romania_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'])
+
+	"""Ejecutar busqueda en Amplitud (BFS) """
+	node_solucionBFS = graph_search(romania_problem, FIFOQueue())
+	print( 'Solucion del Problema de Busqueda en mapa de Romania con BFS: {}'.format(node_solucionBFS.solution()) )
+
+	"""Ejecutar busqueda en Profundidad (DFS) """
+	node_solucionDFS = graph_search(romania_problem, [])  # una lista [] es una pila en Python
+	print( 'Solucion del Problema de Busqueda en mapa de Romania con DFS: {}'.format(node_solucionDFS.solution()) )
+
+	print(args['mapa'])
+
+
+	"""solvers = {'sa': sa_solver,	'ga': ga_solver }  # Dictionary of available solvers
+
+	solvers[args['solver']]( args['puzzle'], args['solverParams'] )  # Call the solver method passing the string of"""
 
 
 #____________________________________________________________________________________________________________________________
