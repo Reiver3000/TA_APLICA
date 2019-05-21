@@ -4,10 +4,11 @@ def readCommand( argv ):
 	"""
 	from optparse import OptionParser
 	
-	usageStr=	"""	USAGE:      python findroute.py <options>
-					EXAMPLES:   python findroute.py -e Archivos\edges_pitts.txt –s 275754986 -g 105012740 –m astar -h Archivos\heuristics_pitts.txt
-								python findroute.py --help
-				"""
+	usageStr="""
+	USAGE:      python findroute.py <options>
+	EXAMPLES:   python findroute.py -e Archivos\edges_pitts.txt –s 275754986 -g 105012740 –m astar -h Archivos\heuristics_pitts.txt
+				python findroute.py --help
+	"""
 
 	parser = OptionParser(usageStr)
 	parser.add_option('-e', '--calles', dest='calles', help= 'El nombre del archivo con las calles', default='Archivos\edges_pitts.txt')
@@ -19,7 +20,7 @@ def readCommand( argv ):
 	options, otherjunk = parser.parse_args(argv)
 
 	if len(otherjunk) != 0:
-		raise Exception('Command line input not understood: ' + str(otherjunk))
+		raise Exception('Opciones que no se han podido entender: ' + str(otherjunk))
 
 	e_pits_txt = open(options.calles,"r")
 	lineas = e_pits_txt.readlines()
