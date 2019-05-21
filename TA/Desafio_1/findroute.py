@@ -29,7 +29,7 @@ if __name__=="__main__":
 	print(args['mapa'])
 	"""
 
-	"""Instancia el problema de busqueda con nodo inicial 'A' y nodo objetivo 'B' """
+	"""Instancia el problema de busqueda con nodo inicial 'nodoI' y nodo objetivo 'nodoF' """
 	romania_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'])
 
 	"""Ejecutar busqueda en Amplitud (BFS) """

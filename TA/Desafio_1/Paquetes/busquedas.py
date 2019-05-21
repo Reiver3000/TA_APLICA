@@ -49,8 +49,9 @@ class Node:
 
     def child_node(self, problem, action):
         next_state = problem.result(self.state, action)
-        return Node(next_state, self, action,
+        next_node = Node(next_state, self, action,
                     problem.path_cost(self.path_cost, self.state, action, next_state))
+        return next_node
 
     def solution(self):
         "Retorna la secuencia de acciones para ir de la raiz a este nodo."
@@ -64,15 +65,6 @@ class Node:
             node = node.parent
         return list(reversed(path_back))
 
-def tree_search(problem, frontier):
-
-    frontier.append(Node(problem.initial))
-    while frontier:
-        node = frontier.pop()
-        if problem.goal_test(node.state):
-            return node
-        frontier.extend(node.expand(problem))
-    return None
 
 def graph_search(problem, frontier):
 
@@ -91,16 +83,18 @@ def graph_search(problem, frontier):
 
 class MapSearchProblem(Problem):
     def __init__(self, initial, goal, mapa):
-        """El constructor recibe  el estado inicial, el estado objetivo y un mapa (de clase Mapa)"""
+        """
+        El constructor recibe  el estado inicial, el estado objetivo y un mapa (de clase diccionario)"""
         self.initial = initial
         self.goal = goal
         self.map = mapa
 
     def actions(self, state):
-        """Retorna las acciones ejecutables desde ciudad state.
-        El resultado es una lista de strings tipo 'goCity'.
-        Por ejemplo, en el mapa de Romania, las acciones desde Arad serian:
-         ['goZerind', 'goTimisoara', 'goSibiu']"""
+        """ Retorna las acciones ejecutables desde ciudad state.
+            El resultado es una lista de strings tipo 'goCity'.
+            Por ejemplo, en el mapa de Romania, las acciones desde Arad serian:
+            ['goZerind', 'goTimisoara', 'goSibiu']
+        """
         neighbors = []
         acciones = []
         neighbors = self.map[state]
@@ -109,10 +103,12 @@ class MapSearchProblem(Problem):
         return acciones
 
     def result(self, state, action):
-        """Retorna el estado que resulta de ejecutar la accion dada desde ciudad state.
-        La accion debe ser alguna de self.actions(state)
-        Por ejemplo, en el mapa de Romania, el resultado de aplicar la accion 'goZerind'
-        desde el estado 'Arad' seria 'Zerind'"""
+        """ Retorna el estado que resulta de ejecutar la accion dada desde ciudad state.
+            La accion debe ser alguna de self.actions(state)
+            Por ejemplo, en el mapa de Romania, el resultado de aplicar la accion 'goZerind'
+            desde el estado 'Arad' seria 'Zerind'
+        """
+
         newState = action[2]
         return newState
 
@@ -121,9 +117,11 @@ class MapSearchProblem(Problem):
         return (self.goal == state)
 
     def path_cost(self, c, state1, action, state2):
-        """Retorna el costo del camino de state2 viniendo de state1 con la accion action
-        El costo del camino para llegar a state1 es c. El costo de la accion debe ser
-        extraido de self.map."""
+        """ Retorna el costo del camino de state2 viniendo de state1 con la accion action
+            El costo del camino para llegar a state1 es c. El costo de la accion debe ser
+            extraido de self.map.
+        """
+
         actionCost = 0
         destStates = self.map[state1] #estado destino, state2
         for acc in range(len(destStates)):
