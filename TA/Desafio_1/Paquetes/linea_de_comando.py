@@ -5,9 +5,8 @@ def readCommand( argv ):
 	from optparse import OptionParser
 	usageStr = """
 	USAGE:      python findroute.py <options>
-	EXAMPLES:   python findroute.py -e edges_pitts.txt –s 275754986 -g 105012740 –m astar -h heuristics_pitts.txt
-                python findroute.py -e --help
-
+	EXAMPLES:   python findroute.py -e Archivos\edges_pitts.txt –s 275754986 -g 105012740 –m astar -h heuristics_pitts.txt
+                python findroute.py --help
 	"""
 
 	parser = OptionParser(usageStr)
@@ -22,7 +21,7 @@ def readCommand( argv ):
 	if len(otherjunk) != 0:
 		raise Exception('Command line input not understood: ' + str(otherjunk))
 
-	e_pits_txt = open(options.calles,"r")    # lee el nombre de las calles
+	e_pits_txt = open(options.calles,"r")
 	lineas = e_pits_txt.readlines()
 	lista=[]
 	for linea in lineas:
@@ -48,7 +47,7 @@ def readCommand( argv ):
 			h_pitts.append(linea.split())
 
 	args = dict()
-	args['mapa'] = mapa  # puzzle es un vector con todas las filas del puzzle concatenadas (vacios tiene valor 0)
+	args['mapa'] = mapa
 	args['nodoI'] = options.nodoI
 	args['nodoF'] =  options.nodoF
 	args['busqueda'] = options.busqueda

@@ -103,7 +103,6 @@ class MapSearchProblem(Problem):
          ['goZerind', 'goTimisoara', 'goSibiu']"""
         neighbors = []
         acciones = []
-        tupla = ()
         neighbors = self.map[state]
         for acc in range(len(neighbors)):
             acciones.append('go' + neighbors[acc][0])
@@ -125,13 +124,13 @@ class MapSearchProblem(Problem):
         """Retorna el costo del camino de state2 viniendo de state1 con la accion action
         El costo del camino para llegar a state1 es c. El costo de la accion debe ser
         extraido de self.map."""
-        actionCost = 0;
+        actionCost = 0
         destStates = self.map[state1] #estado destino, state2
         for acc in range(len(destStates)):
             if (destStates[acc][0] == state2):
                 actionCost = float(destStates[acc][1])
                 break
-        return c + actionCost;
+        return c + actionCost
 
 from collections import deque
 

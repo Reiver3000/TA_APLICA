@@ -1,14 +1,15 @@
 import sys
+"""
 import time
 import numpy as np
 from random import shuffle, random, sample, randint
 from copy import deepcopy
 from math import exp
-
+"""
 #____________________________________________________________________________________________________________________________
 
 from Paquetes.linea_de_comando import readCommand
-from Paquetes.busquedas import *
+from Paquetes.busquedas import graph_search,MapSearchProblem,FIFOQueue
 
 if __name__=="__main__":
 	"""
@@ -19,11 +20,14 @@ if __name__=="__main__":
 
 	> python findroute.py --help
     """
-	args = readCommand( sys.argv[1:] ) # Get the arguments from the command line input
+	args = readCommand( sys.argv[1:] )
+
+	"""
 	print(args['nodoI'])
 	print(args['nodoF'])
 	print(args['busqueda'])
 	print(args['mapa'])
+	"""
 
 	"""Instancia el problema de busqueda con nodo inicial 'A' y nodo objetivo 'B' """
 	romania_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'])
@@ -35,8 +39,6 @@ if __name__=="__main__":
 	"""Ejecutar busqueda en Profundidad (DFS) """
 	node_solucionDFS = graph_search(romania_problem, [])  # una lista [] es una pila en Python
 	print( 'Solucion del Problema de Busqueda en mapa de Romania con DFS: {}'.format(node_solucionDFS.solution()) )
-
-	print(args['mapa'])
 
 
 	"""solvers = {'sa': sa_solver,	'ga': ga_solver }  # Dictionary of available solvers
