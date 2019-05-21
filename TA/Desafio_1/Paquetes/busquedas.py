@@ -1,18 +1,21 @@
 class Problem(object):
     def __init__(self, initial, goal=None):
-        """Este constructor especifica el estado inicial y posiblemente el estado(s) objetivo(s),
-        La subclase puede añadir mas argumentos."""
+        """ Este constructor especifica el estado inicial y posiblemente el estado(s) objetivo(s),
+            La subclase puede añadir mas argumentos.
+        """
         self.initial = initial
         self.goal = goal
 
     def actions(self, state):
-        """Retorna las acciones que pueden ser ejecutadas en el estado dado.
-        El resultado es tipicamente una lista."""
+        """ Retorna las acciones que pueden ser ejecutadas en el estado dado.
+            El resultado es tipicamente una lista.
+        """
         raise NotImplementedError
 
     def result(self, state, action):
-        """Retorna el estado que resulta de ejecutar la accion dada en el estado state.
-        La accion debe ser alguna de self.actions(state)."""
+        """ Retorna el estado que resulta de ejecutar la accion dada en el estado state.
+            La accion debe ser alguna de self.actions(state).
+        """
         raise NotImplementedError
 
     def goal_test(self, state):
@@ -20,20 +23,22 @@ class Problem(object):
         raise NotImplementedError
 
     def path_cost(self, c, state1, action, state2):
-        """Retorna el costo del camino de state2 viniendo de state1 con
-        la accion action, asumiendo un costo c para llegar hasta state1.
-        El metodo por defecto cuesta 1 para cada paso en el camino."""
+        """ Retorna el costo del camino de state2 viniendo de state1 con
+            la accion action, asumiendo un costo c para llegar hasta state1.
+            El metodo por defecto cuesta 1 para cada paso en el camino.
+        """
         return c + 1
 
     def value(self, state):
-        """En problemas de optimizacion, cada estado tiene un valor. Algoritmos
-        como Hill-climbing intentan maximizar este valor."""
+        """ En problemas de optimizacion, cada estado tiene un valor. Algoritmos
+            como Hill-climbing intentan maximizar este valor.
+        """
         raise NotImplementedError
 
 class Node:
 
     def __init__(self, state, parent=None, action=None, path_cost=0):
-        "Crea un nodo de arbol de busqueda, derivado del nodo parent y accion action"
+        """Crea un nodo de arbol de busqueda, derivado del nodo parent y accion action"""
         self.state = state
         self.parent = parent
         self.action = action
@@ -43,9 +48,14 @@ class Node:
             self.depth = parent.depth + 1
 
     def expand(self, problem):
-        "Devuelve los nodos alcanzables en un paso a partir de este nodo."
-        return [self.child_node(problem, action)
+        """Devuelve los nodos alcanzables en un paso a partir de este nodo."""
+        lista_expandida=[self.child_node(problem, action)
                 for action in problem.actions(self.state)]
+        print("-------------------------------")
+        for nodo in lista_expandida:
+            print(nodo)
+        print("-------------------------------")
+        return lista_expandida
 
     def child_node(self, problem, action):
         next_state = problem.result(self.state, action)
@@ -54,16 +64,19 @@ class Node:
         return next_node
 
     def solution(self):
-        "Retorna la secuencia de acciones para ir de la raiz a este nodo."
+        """Retorna la secuencia de acciones para ir de la raiz a este nodo."""
         return [node.action for node in self.path()[1:]]
 
     def path(self):
-        "Retorna una lista de nodos formando un camino de la raiz a este nodo."
+        """Retorna una lista de nodos formando un camino de la raiz a este nodo."""
         node, path_back = self, []
         while node:
             path_back.append(node)
             node = node.parent
         return list(reversed(path_back))
+
+    def __str__(self):
+        return str(self.state)
 
 
 def graph_search(problem, frontier):
@@ -71,20 +84,23 @@ def graph_search(problem, frontier):
     frontier.append(Node(problem.initial))
     explored = set()
     while frontier:
+        print("********************************************************")
+        print(explored)
+        for nodo in frontier:
+            print(nodo)
         node = frontier.pop()
         if problem.goal_test(node.state):
             return node
         explored.add(node.state)
         frontier.extend(child for child in node.expand(problem)
-                        if child.state not in explored and
-                        child not in frontier)
+                        if( (child.state not in explored) and
+                        (child not in frontier)))
     return None
 
 
 class MapSearchProblem(Problem):
     def __init__(self, initial, goal, mapa):
-        """
-        El constructor recibe  el estado inicial, el estado objetivo y un mapa (de clase diccionario)"""
+        """El constructor recibe  el estado inicial, el estado objetivo y un mapa (de clase diccionario)"""
         self.initial = initial
         self.goal = goal
         self.map = mapa
@@ -97,9 +113,15 @@ class MapSearchProblem(Problem):
         """
         neighbors = []
         acciones = []
-        neighbors = self.map[state]
+        #print('\n\n')
+        #print(self.map)
+        neighbors = self.map[int(state)]
+        print('-----------------------------------------------')
+        print(state)
+        print(neighbors)
         for acc in range(len(neighbors)):
-            acciones.append('go' + neighbors[acc][0])
+            acciones.append('go' + str(neighbors[acc][0]))
+        print(acciones)
         return acciones
 
     def result(self, state, action):
@@ -109,7 +131,7 @@ class MapSearchProblem(Problem):
             desde el estado 'Arad' seria 'Zerind'
         """
 
-        newState = action[2]
+        newState = action[2:]
         return newState
 
     def goal_test(self, state):
@@ -123,7 +145,7 @@ class MapSearchProblem(Problem):
         """
 
         actionCost = 0
-        destStates = self.map[state1] #estado destino, state2
+        destStates = self.map[int(state1)]
         for acc in range(len(destStates)):
             if (destStates[acc][0] == state2):
                 actionCost = float(destStates[acc][1])

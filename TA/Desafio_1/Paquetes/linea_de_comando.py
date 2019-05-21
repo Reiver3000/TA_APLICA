@@ -30,15 +30,15 @@ def readCommand( argv ):
 
 	mapa = dict()
 	for sublista in lista:
-		if sublista[0] in mapa:
-			mapa[sublista[0]].append((sublista[1],sublista[2]))
+		if int(sublista[0]) in mapa:
+			mapa[int(sublista[0])].append((int(sublista[1]),float(sublista[2])))
 		else:
-			mapa[sublista[0]]=[(sublista[1],sublista[2])]
+			mapa[int(sublista[0])]=[(int(sublista[1]),float(sublista[2]))]
 
-		if sublista[1] in mapa:
-			mapa[sublista[1]].append((sublista[0],sublista[2]))
+		if int(sublista[1]) in mapa:
+			mapa[int(sublista[1])].append((int(sublista[0]),float(sublista[2])))
 		else:
-			mapa[sublista[1]]=[(sublista[0],sublista[2])]
+			mapa[int(sublista[1])]=[(int(sublista[0]),float(sublista[2]))]
 
 	if options.heuristica!="":
 		h_pitts_txt=open(options.heuristica,"r")

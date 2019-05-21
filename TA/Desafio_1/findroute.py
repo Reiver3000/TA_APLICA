@@ -28,17 +28,29 @@ if __name__=="__main__":
 	print(args['busqueda'])
 	print(args['mapa'])
 	"""
+	#print(args['mapa'])
+	for key in sorted(args['mapa']):
+		print(str(key) +"::"+ str(args['mapa'][key]))
 
-	"""Instancia el problema de busqueda con nodo inicial 'nodoI' y nodo objetivo 'nodoF' """
+	"""Instancia el problema de busqueda con nodo inicial 'nodoI' y nodo objetivo 'nodoF'"""
 	romania_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'])
 
 	"""Ejecutar busqueda en Amplitud (BFS) """
 	node_solucionBFS = graph_search(romania_problem, FIFOQueue())
-	print( 'Solucion del Problema de Busqueda en mapa de Romania con BFS: {}'.format(node_solucionBFS.solution()) )
+	if node_solucionBFS!=None:
+		print( 'Solucion del Problema de Busqueda en mapa de Romania con BFS: {}'.format(node_solucionBFS.solution()))
+	else:
+		print("No hay solución BFS")
 
+
+	print("=====================================================================")
+	
 	"""Ejecutar busqueda en Profundidad (DFS) """
 	node_solucionDFS = graph_search(romania_problem, [])  # una lista [] es una pila en Python
-	print( 'Solucion del Problema de Busqueda en mapa de Romania con DFS: {}'.format(node_solucionDFS.solution()) )
+	if node_solucionDFS!=None:
+		print( 'Solucion del Problema de Busqueda en mapa de Romania con DFS: {}'.format(node_solucionDFS.solution()) )
+	else:
+		print("No hay solución DFS")
 
 
 	"""solvers = {'sa': sa_solver,	'ga': ga_solver }  # Dictionary of available solvers
