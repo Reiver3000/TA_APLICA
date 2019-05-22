@@ -9,7 +9,7 @@ from math import exp
 #____________________________________________________________________________________________________________________________
 
 from Paquetes.linea_de_comando import readCommand
-from Paquetes.busquedas import graph_search,MapSearchProblem,FIFOQueue
+from Paquetes.busquedas import graph_search,MapSearchProblem,FIFOQueue,iterative_deeping_search,depth_first_tree_search,bidirectional_search
 
 if __name__=="__main__":
 	"""
@@ -20,44 +20,68 @@ if __name__=="__main__":
 
 	> python findroute.py --help
     """
+
 	args = readCommand( sys.argv[1:] )
 
-	"""
-	print(args['nodoI'])
-	print(args['nodoF'])
-	print(args['busqueda'])
-	print(args['mapa'])
-	"""
-	#print(args['mapa'])
-	for key in sorted(args['mapa']):
-		print(str(key) +"::"+ str(args['mapa'][key]))
 
 	"""Instancia el problema de busqueda con nodo inicial 'nodoI' y nodo objetivo 'nodoF'"""
-	romania_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'])
+	map_problem = MapSearchProblem(args['nodoI'], args['nodoF'], args['mapa'])
 
-	"""Ejecutar busqueda en Amplitud (BFS) """
-	node_solucionBFS = graph_search(romania_problem, FIFOQueue())
-	if node_solucionBFS!=None:
-		print( 'Solucion del Problema de Busqueda en mapa de Romania con BFS: {}'.format(node_solucionBFS.solution()))
-	else:
-		print("No hay solución BFS")
+	if(args['busqueda']=='bfs'):
+		"""Ejecutar busqueda en Amplitud (BFS) """
+		node_solucionBFS,nodos_visitados,nodos_en_memoria = graph_search(map_problem, FIFOQueue())
+		if node_solucionBFS!=None:
+			print( 'Solucion del Problema de Busqueda en mapa con BFS: {}'.format(node_solucionBFS.solution()))
+			print( 'Nro de nodos visitados: {}'.format(nodos_visitados) )
+			print( 'Nro de nodos en memoria: {}'.format(nodos_en_memoria))
+		else:
+			print("No hay solución BFS")
 
+	if(args['busqueda']=='dfs'):
+		"""Ejecutar busqueda en Profundidad (DFS) """
+		node_solucionDFS,nodos_visitados,nodos_en_memoria = graph_search(map_problem, [])
+		if node_solucionDFS!=None:
+			print( 'Solucion del Problema de Busqueda en mapa con DFS: {}'.format(node_solucionDFS.solution()) )
+			print( 'Nro de nodos visitados: {}'.format(nodos_visitados) )
+			print( 'Nro de nodos en memoria: {}'.format(nodos_en_memoria))
+		else:
+			print("No hay solución DFS")
 
-	print("=====================================================================")
-	
-	"""Ejecutar busqueda en Profundidad (DFS) """
-	node_solucionDFS = graph_search(romania_problem, [])  # una lista [] es una pila en Python
-	if node_solucionDFS!=None:
-		print( 'Solucion del Problema de Busqueda en mapa de Romania con DFS: {}'.format(node_solucionDFS.solution()) )
-	else:
-		print("No hay solución DFS")
+	if(args['busqueda']=='ids'):
+		"""Ejecutar busqueda iterativa en Profundidad (IDS) """
+		node_solucionIDS,nodos_visitados, nodos_en_memoria = iterative_deeping_search(map_problem)
+		if node_solucionIDS!=None:
+			print( 'Solucion del Problema de Busqueda en mapa con IDS: {}'.format(node_solucionIDS.solution()) )
+			print( 'Nro de nodos visitados: {}'.format(nodos_visitados) )
+			print( 'Nro de nodos en memoria: {}'.format(nodos_en_memoria))
+		else:
+			print("No hay solución IDs")
 
+	if(args['busqueda']=='bis'):
+		"""Ejecutar busqueda Bidireccional (BIS) """
+		node_solucionBIS1, node_solucionBIS2= bidirectional_search(map_problem,FIFOQueue(),FIFOQueue())
+		if node_solucionBIS1!=None:
+			#print(node_solucionBIS1.state)
+			#print(node_solucionBIS2.state)
+			solucion1=node_solucionBIS1.solution()
+			solucion2=node_solucionBIS2.solution()
 
-	"""solvers = {'sa': sa_solver,	'ga': ga_solver }  # Dictionary of available solvers
+			respuesta= solucion1+solucion2
+			solucion3=[]
+			for i in respuesta:
+				if i not in solucion3:
+					solucion3.append(i) 
+			print( 'Solucion del Problema de Busqueda en mapa con IDS: {}'.format(solucion3) )
+		else:
+			print("No hay solución BIS")
+		#print( 'Nro de nodos visitados: {}'.format(nodos_visitados) )
+		#print( 'Nro de nodos en memoria: {}'.format(nodos_en_memoria))
 
-	solvers[args['solver']]( args['puzzle'], args['solverParams'] )  # Call the solver method passing the string of"""
-
-
+	if(args['busqueda']=='astar'):
+		"""Ejecutar busqueda A* """
+		node_solucionASTAR=[]
+		if node_solucionASTAR!=None:
+			pass
 #____________________________________________________________________________________________________________________________
 """
 (╯°□°）╯︵ ┻━┻

@@ -3,7 +3,7 @@ def readCommand( argv ):
 	Procesa los argumentos de la linea de comandos
 	"""
 	from optparse import OptionParser
-	
+
 	usageStr="""
 	USAGE:      python findroute.py <options>
 	EXAMPLES:   python findroute.py -e Archivos\edges_pitts.txt –s 275754986 -g 105012740 –m astar -h Archivos\heuristics_pitts.txt

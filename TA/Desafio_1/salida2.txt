@@ -1,0 +1,3 @@
+Solucion del Problema de Busqueda en mapa con BFS: ['go689935073', 'go105735029', 'go689934347', 'go104572604', 'go105938038', 'go105938047', 'go105012342', 'go105938052', 'go105096416', 'go105012740']
+Nro de nodos visitados: 784
+Nro de nodos en memoria: 1112

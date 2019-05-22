@@ -1,3 +1,5 @@
+import sys
+
 class Problem(object):
     def __init__(self, initial, goal=None):
         """ Este constructor especifica el estado inicial y posiblemente el estado(s) objetivo(s),
@@ -51,10 +53,6 @@ class Node:
         """Devuelve los nodos alcanzables en un paso a partir de este nodo."""
         lista_expandida=[self.child_node(problem, action)
                 for action in problem.actions(self.state)]
-        print("-------------------------------")
-        for nodo in lista_expandida:
-            print(nodo)
-        print("-------------------------------")
         return lista_expandida
 
     def child_node(self, problem, action):
@@ -78,25 +76,130 @@ class Node:
     def __str__(self):
         return str(self.state)
 
+def depth_first_tree_search(problem,frontier):
+    """Search the deepest nodes in the search tree first.
+        Search through the successors of a problem to find a goal.
+        The argument frontier should be an empty queue.
+        Repeats infinitely in case of loops. [Figure 3.7]"""
+
+    frontier.append(Node(problem.initial))
+    nodos_visitados=0
+    while frontier:
+        node = frontier.pop()
+        nodos_visitados+=1
+        if problem.goal_test(node.state):
+            return node,nodos_visitados,len(node.solution())
+        frontier.extend(node.expand(problem))
+    return None,nodos_visitados
 
 def graph_search(problem, frontier):
 
     frontier.append(Node(problem.initial))
     explored = set()
+    nodos_visitados=1
+    nodos_en_memoria=1
     while frontier:
-        print("********************************************************")
-        print(explored)
-        for nodo in frontier:
-            print(nodo)
         node = frontier.pop()
+        nodos_visitados+=1
         if problem.goal_test(node.state):
-            return node
+            return node,nodos_visitados,len(frontier)+nodos_visitados
         explored.add(node.state)
         frontier.extend(child for child in node.expand(problem)
                         if( (child.state not in explored) and
                         (child not in frontier)))
-    return None
+    return None,nodos_visitados,len(frontier)+nodos_visitados
 
+
+def iterative_deeping_search(problem):
+    nodos_visitados=0
+    for depth in range(sys.maxsize):
+        result, nodos =depth_limited_search(problem, depth)
+        nodos_visitados+=nodos
+        if result != 'cutoff':
+            return result,nodos_visitados,len(result.solution())
+
+def depth_limited_search(problem, limit=10):
+    result, nodos_visitados= recursive_dls(Node(problem.initial), problem, limit)
+    return (result,nodos_visitados)
+
+def recursive_dls(node, problem, limit):
+    nodos_visitados=0
+    if problem.goal_test(node.state):
+        nodos_visitados+=1
+        return (node,nodos_visitados)
+    elif limit==0:
+        nodos_visitados+=1
+        return ('cutoff',nodos_visitados)
+    else:
+        cutoff_occurred=False
+        for child in node.expand(problem):
+            result,nodos_visitadosh=recursive_dls(child,problem, limit-1)
+            nodos_visitados+=nodos_visitadosh
+
+            if result=='cutoff':
+                cutoff_occurred=True
+
+            elif result is not None:
+                return (result,nodos_visitados)
+        return ('cutoff',nodos_visitados) if cutoff_occurred else (None,nodos_visitados)
+
+def interseccion(lista1, lista2):
+    intrs1=[value for value in lista1 if value.state in [estado.state for estado in lista2]]
+    intrs2=[value for value in lista2 if value.state in [estado.state for estado in lista1]]
+    return intrs1,intrs2
+
+def bidirectional_search(problem, frontierA, frontierP):
+
+    frontierA.append(Node(problem.initial))
+    frontierP.append(Node(problem.goal))
+
+    nodos_visitadosA=[]
+    nodos_visitadosP=[]
+
+    exploredA = set()
+    exploredP = set()
+
+    #nodos_visitadosA=1
+    nodos_en_memoriaA=1
+
+    #nodos_visitadosP=1
+    nodos_en_memoriaP=1
+
+    #nodeP=None
+    #nodeA=None
+
+    while frontierA and frontierP:
+        """
+        if nodeP!=None and nodeA!=None:
+            if nodeP.state==nodeA.state:
+                return nodeA,nodeP
+        """
+        intrs1,intrs2=interseccion(frontierA,frontierP)
+        if len(intrs1)!=0:
+            return intrs1[0], intrs2[0]
+
+        nodeA = frontierA.pop()
+        nodos_visitadosA.append(nodeA)
+
+        nodeP = frontierP.pop()
+        nodos_visitadosP.append(nodeP)
+            
+        #nodos_visitadosA+=1
+        #nodos_visitadosP+=1
+
+        exploredA.add(nodeA.state)
+        #print('+',nodeA)
+        exploredP.add(nodeP.state)
+        #print('-',nodeP)
+
+        frontierA.extend(   child for child in nodeA.expand(problem)
+                            if( (child.state not in exploredA) and (child.state not in (ndo.state for ndo in frontierA)))    )
+        frontierP.extend(   child for child in nodeP.expand(problem)
+                            if( (child.state not in exploredP) and (child.state not in (ndo.state for ndo in frontierP)))    )
+
+
+
+    return None,None
 
 class MapSearchProblem(Problem):
     def __init__(self, initial, goal, mapa):
@@ -113,15 +216,9 @@ class MapSearchProblem(Problem):
         """
         neighbors = []
         acciones = []
-        #print('\n\n')
-        #print(self.map)
         neighbors = self.map[int(state)]
-        print('-----------------------------------------------')
-        print(state)
-        print(neighbors)
         for acc in range(len(neighbors)):
             acciones.append('go' + str(neighbors[acc][0]))
-        print(acciones)
         return acciones
 
     def result(self, state, action):
