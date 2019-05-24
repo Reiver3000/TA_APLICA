@@ -6,7 +6,7 @@ def readCommand( argv ):
 
 	usageStr="""
 	USAGE:      python findroute.py <options>
-	EXAMPLES:   python findroute.py -e Archivos\edges_pitts.txt –s 275754986 -g 105012740 –m astar -h Archivos\heuristics_pitts.txt
+	EXAMPLES:   python findroute.py -e Archivos\edges_pitts.txt –s 275754986 -g 105012740 –m astar -l Archivos\heuristics_pitts.txt
 				python findroute.py --help
 	"""
 
@@ -47,6 +47,10 @@ def readCommand( argv ):
 		for linea in lineas:
 			h_pitts.append(linea.split())
 
+		heuristica = dict()
+		for nodo in h_pitts:
+			heuristica[int(nodo[0])]=float(nodo[0])
+
 	args = dict()
 	args['mapa'] = mapa
 	args['nodoI'] = options.nodoI
@@ -54,7 +58,7 @@ def readCommand( argv ):
 	args['busqueda'] = options.busqueda
 
 	if options.heuristica!="":
-		args['heuristica'] = h_pitts
+		args['heuristica'] = heuristica
 	else:
 		args['heuristica'] = options.heuristica
 

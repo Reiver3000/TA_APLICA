@@ -1,81 +1,14 @@
 import sys
+from Paquetes.definicionProblema import *
 
-class Problem(object):
-    def __init__(self, initial, goal=None):
-        """ Este constructor especifica el estado inicial y posiblemente el estado(s) objetivo(s),
-            La subclase puede añadir mas argumentos.
-        """
-        self.initial = initial
-        self.goal = goal
+#____________________________________________________________________________________________________________________________
+from collections import deque
 
-    def actions(self, state):
-        """ Retorna las acciones que pueden ser ejecutadas en el estado dado.
-            El resultado es tipicamente una lista.
-        """
-        raise NotImplementedError
-
-    def result(self, state, action):
-        """ Retorna el estado que resulta de ejecutar la accion dada en el estado state.
-            La accion debe ser alguna de self.actions(state).
-        """
-        raise NotImplementedError
-
-    def goal_test(self, state):
-        """Retorna True si el estado pasado satisface el objetivo."""
-        raise NotImplementedError
-
-    def path_cost(self, c, state1, action, state2):
-        """ Retorna el costo del camino de state2 viniendo de state1 con
-            la accion action, asumiendo un costo c para llegar hasta state1.
-            El metodo por defecto cuesta 1 para cada paso en el camino.
-        """
-        return c + 1
-
-    def value(self, state):
-        """ En problemas de optimizacion, cada estado tiene un valor. Algoritmos
-            como Hill-climbing intentan maximizar este valor.
-        """
-        raise NotImplementedError
-
-class Node:
-
-    def __init__(self, state, parent=None, action=None, path_cost=0):
-        """Crea un nodo de arbol de busqueda, derivado del nodo parent y accion action"""
-        self.state = state
-        self.parent = parent
-        self.action = action
-        self.path_cost = path_cost
-        self.depth = 0
-        if parent:
-            self.depth = parent.depth + 1
-
-    def expand(self, problem):
-        """Devuelve los nodos alcanzables en un paso a partir de este nodo."""
-        lista_expandida=[self.child_node(problem, action)
-                for action in problem.actions(self.state)]
-        return lista_expandida
-
-    def child_node(self, problem, action):
-        next_state = problem.result(self.state, action)
-        next_node = Node(next_state, self, action,
-                    problem.path_cost(self.path_cost, self.state, action, next_state))
-        return next_node
-
-    def solution(self):
-        """Retorna la secuencia de acciones para ir de la raiz a este nodo."""
-        return [node.action for node in self.path()[1:]]
-
-    def path(self):
-        """Retorna una lista de nodos formando un camino de la raiz a este nodo."""
-        node, path_back = self, []
-        while node:
-            path_back.append(node)
-            node = node.parent
-        return list(reversed(path_back))
-
-    def __str__(self):
-        return str(self.state)
-
+class FIFOQueue(deque):
+    """Una cola First-In-First-Out"""
+    def pop(self):
+        return self.popleft()
+#____________________________________________________________________________________________________________________________
 def depth_first_tree_search(problem,frontier):
     """Search the deepest nodes in the search tree first.
         Search through the successors of a problem to find a goal.
@@ -91,7 +24,7 @@ def depth_first_tree_search(problem,frontier):
             return node,nodos_visitados,len(node.solution())
         frontier.extend(node.expand(problem))
     return None,nodos_visitados
-
+#____________________________________________________________________________________________________________________________
 def graph_search(problem, frontier):
 
     frontier.append(Node(problem.initial))
@@ -108,7 +41,7 @@ def graph_search(problem, frontier):
                         if( (child.state not in explored) and
                         (child not in frontier)))
     return None,nodos_visitados,len(frontier)+nodos_visitados
-
+#____________________________________________________________________________________________________________________________
 
 def iterative_deeping_search(problem):
     nodos_visitados=0
@@ -142,116 +75,176 @@ def recursive_dls(node, problem, limit):
             elif result is not None:
                 return (result,nodos_visitados)
         return ('cutoff',nodos_visitados) if cutoff_occurred else (None,nodos_visitados)
-
+#____________________________________________________________________________________________________________________________
 def interseccion(lista1, lista2):
-    intrs1=[value for value in lista1 if value.state in [estado.state for estado in lista2]]
-    intrs2=[value for value in lista2 if value.state in [estado.state for estado in lista1]]
-    return intrs1,intrs2
-
+    intrs1=[value for value in lista1
+            if value.state in [estado.state for estado in lista2]]
+    intrs2=[value for value in lista2
+            if value.state in [estado.state for estado in lista1]]
+    bandera=0
+    insta=[]
+    instb=[]
+    for i in intrs1:
+        if bandera==1:
+            break
+        for j in intrs2:
+            if (i.state==j.state):
+                #print("encontrado")
+                #print(i.state)
+                #print(j.state)
+                insta=[]
+                instb=[]
+                insta=[i]
+                instb=[j]
+                bandera=1
+                break
+    #print(len(insta))
+    #print(len(instb))
+    #print("los datos intersectados1")
+    #for i in insta:
+    #    print(i.state)
+    #print("los datos intersectados2")
+    #for i in instb:
+    #    print(i.state)
+    return insta,instb
 def bidirectional_search(problem, frontierA, frontierP):
 
     frontierA.append(Node(problem.initial))
     frontierP.append(Node(problem.goal))
-
     nodos_visitadosA=[]
     nodos_visitadosP=[]
-
     exploredA = set()
     exploredP = set()
-
-    #nodos_visitadosA=1
     nodos_en_memoriaA=1
-
-    #nodos_visitadosP=1
     nodos_en_memoriaP=1
 
-    #nodeP=None
-    #nodeA=None
-
+    lista_exploradosA=[] #esto debe eliminarse-----------------------------
+    lista_exploradosP=[] #esto debe eliminarse------------------------------
+    listaVisitadosA=[]
+    listaVisitadosP=[]
     while frontierA and frontierP:
-        """
-        if nodeP!=None and nodeA!=None:
-            if nodeP.state==nodeA.state:
-                return nodeA,nodeP
-        """
-        intrs1,intrs2=interseccion(frontierA,frontierP)
-        if len(intrs1)!=0:
+        
+        intrs1,intrs2=interseccion(lista_exploradosA,frontierP)#Si se cruzan en los explorados de A
+        intrs3,intrs4=interseccion(frontierA,lista_exploradosP)#si se cruzan en los explorados de P
+        intrs5,intrs6=interseccion(frontierA,frontierP)#si se cruzan solo en la frontera
+        fronteraA=[]
+        for i in frontierA:
+            fronteraA.append(i.state)
+        fronteraP=[]
+        for i in frontierP:
+            fronteraP.append(i.state)
+        #print("LA FRONTERA DE P",fronteraP)
+        #print("LA FRONTERA DE A",fronteraA)
+
+        if len(intrs1)!=0:#primero vemos si sse cruzan en los explorados de A
+        #    print("primero")
             return intrs1[0], intrs2[0]
-
+        if len(intrs3)!=0:#Luego vemos si sse cruzan en los explorados de P
+        #    print("segundo")
+            return intrs3[0], intrs4[0]
+        if len(intrs5)!=0:# Al ultimo vemos si se estan cruzando las fronteras
+        #    print("tercero")
+            return intrs5[0], intrs6[0]
         nodeA = frontierA.pop()
+        listaVisitadosA.append(nodeA.state)
         nodos_visitadosA.append(nodeA)
-
+        c=[nodeA]
+        lista_exploradosA+=c
+        #print("NODOS VISITADOS POR A",listaVisitadosA)
         nodeP = frontierP.pop()
         nodos_visitadosP.append(nodeP)
-            
-        #nodos_visitadosA+=1
-        #nodos_visitadosP+=1
+        listaVisitadosP.append(nodeP.state)
+        d=[nodeP]
+        lista_exploradosP+=d
+        #print("NODOS VISITADOS POR P",listaVisitadosP)
 
         exploredA.add(nodeA.state)
-        #print('+',nodeA)
         exploredP.add(nodeP.state)
-        #print('-',nodeP)
 
         frontierA.extend(   child for child in nodeA.expand(problem)
-                            if( (child.state not in exploredA) and (child.state not in (ndo.state for ndo in frontierA)))    )
+                            if( (child.state not in exploredA) and (child.state not in (ndo.state for ndo in frontierA)) )    )
+
         frontierP.extend(   child for child in nodeP.expand(problem)
-                            if( (child.state not in exploredP) and (child.state not in (ndo.state for ndo in frontierP)))    )
-
-
+                            if( (child.state not in exploredP) and (child.state not in (ndo.state for ndo in frontierP)) )    )
 
     return None,None
+#____________________________________________________________________________________________________________________________
 
-class MapSearchProblem(Problem):
-    def __init__(self, initial, goal, mapa):
-        """El constructor recibe  el estado inicial, el estado objetivo y un mapa (de clase diccionario)"""
-        self.initial = initial
-        self.goal = goal
-        self.map = mapa
-
-    def actions(self, state):
-        """ Retorna las acciones ejecutables desde ciudad state.
-            El resultado es una lista de strings tipo 'goCity'.
-            Por ejemplo, en el mapa de Romania, las acciones desde Arad serian:
-            ['goZerind', 'goTimisoara', 'goSibiu']
-        """
-        neighbors = []
-        acciones = []
-        neighbors = self.map[int(state)]
-        for acc in range(len(neighbors)):
-            acciones.append('go' + str(neighbors[acc][0]))
-        return acciones
-
-    def result(self, state, action):
-        """ Retorna el estado que resulta de ejecutar la accion dada desde ciudad state.
-            La accion debe ser alguna de self.actions(state)
-            Por ejemplo, en el mapa de Romania, el resultado de aplicar la accion 'goZerind'
-            desde el estado 'Arad' seria 'Zerind'
-        """
-
-        newState = action[2:]
-        return newState
-
-    def goal_test(self, state):
-        """Retorna True si state es self.goal"""
-        return (self.goal == state)
-
-    def path_cost(self, c, state1, action, state2):
-        """ Retorna el costo del camino de state2 viniendo de state1 con la accion action
-            El costo del camino para llegar a state1 es c. El costo de la accion debe ser
-            extraido de self.map.
-        """
-
-        actionCost = 0
-        destStates = self.map[int(state1)]
-        for acc in range(len(destStates)):
-            if (destStates[acc][0] == state2):
-                actionCost = float(destStates[acc][1])
-                break
-        return c + actionCost
-
-from collections import deque
-
-class FIFOQueue(deque):
-    """Una cola First-In-First-Out"""
+import heapq
+class FrontierPQ:
+    "Una Frontera ordenada por una funcion de costo (Priority Queue)"
+    
+    def __init__(self, initial, costfn=lambda node: node.path_cost):
+        "Inicializa la Frontera con un nodo inicial y una funcion de costo especificada (por defecto es el costo de camino)."
+        self.heap   = []
+        self.states = {}
+        self.costfn = costfn
+        self.add(initial)
+    
+    def add(self, node):
+        "Agrega un nodo a la frontera."
+        cost = self.costfn(node)
+        heapq.heappush(self.heap, (cost, node))
+        self.states[node.state] = node
+        
     def pop(self):
-        return self.popleft()
+        "Remueve y retorna el nodo con minimo costo."
+        (cost, node) = heapq.heappop(self.heap)
+        self.states.pop(node.state, None) # remove state
+        return node
+    
+    def replace(self, node):
+        "node reemplaza al nodo de la Fontera que tiene el mismo estado que node."
+        if node.state not in self:
+            raise ValueError('{} no tiene nada que reemplazar'.format(node.state))
+        for (i, (cost, old_node)) in enumerate(self.heap):
+            if old_node.state == node.state:
+                self.heap[i] = (self.costfn(node), node)
+                heapq._siftdown(self.heap, 0, i)
+                return
+
+    def __contains__(self, state): return state in self.states
+    
+    def __len__(self): return len(self.heap)
+
+def best_first_graph_search(problem, f):
+    """Busca el objetivo expandiendo el nodo de la frontera con el menor valor de la funcion f. Memoriza estados visitados
+    Antes de llamar a este algoritmo hay que especificar La funcion f(node). Si f es node.depth tenemos Busqueda en Amplitud; 
+    si f es node.path_cost tenemos Busqueda  de Costo Uniforme. Si f es una heurística tenemos Busqueda Voraz;
+    Si f es node.path_cost + heuristica(node) tenemos A* """
+
+    frontier = FrontierPQ( Node(problem.initial), f )  # frontera tipo cola de prioridad ordenada por f
+    explored = set()     # memoria de estados visitados
+    visited_nodes = []   # almacena nodos visitados durante la busqueda
+    while frontier:
+        node = frontier.pop()
+        visited_nodes.append(node)        
+        if problem.goal_test(node.state):
+            return node, visited_nodes
+        explored.add(node.state)
+        for action in problem.actions(node.state):
+            child = node.child_node(problem, action)
+            if child.state not in explored and child.state not in frontier:
+                frontier.add(child)
+            elif child.state in frontier:
+                incumbent = frontier.states[child.state] 
+                if f(child) < f(incumbent):
+                    frontier.replace(child)
+    return None,visited_nodes
+
+                    
+def astar_search(problem, heuristic):
+    """ Algoritmo A*, un caso especial de best_first_graph_search con f = path_cost + heuristic  """
+    f = lambda node: node.path_cost + heuristic(node, problem)
+    return best_first_graph_search(problem, f)
+
+def nullheuristic(node, problem):   
+    return 0
+
+def h1(node, problem):
+    #print(problem.heuristica)
+    hrstca = problem.heuristica
+    #print(node.state)
+    #print(hrstca)
+    #print(hrstca[int(node.state)])
+    return hrstca[int(node.state)]
